@@ -155,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
     //----------------------------------------------------------------------------------------------
 
     class SessionCapture extends CameraCaptureSession.CaptureCallback {
+        final int LIMIT = 10;
+        int nCount = 0;
         @Override
         public void onCaptureStarted(@NonNull CameraCaptureSession session,
                                      @NonNull CaptureRequest request,
@@ -167,12 +169,19 @@ public class MainActivity extends AppCompatActivity {
                                        @NonNull CaptureRequest request,
                                        @NonNull TotalCaptureResult result) {
             super.onCaptureCompleted(session, request, result);
+            nCount += 1;
+            if (nCount >= LIMIT) {
+                nCount = 0;
+                try { session.stopRepeating(); }
+                catch (CameraAccessException e) { }
+            }
         }
 
         @Override
         public void onCaptureSequenceCompleted(@NonNull CameraCaptureSession session,
                                                int sequenceId, long frameNumber) {
             super.onCaptureSequenceCompleted(session, sequenceId, frameNumber);
+            step5();
         }
     };
     SessionCapture mSessionCapture = new SessionCapture();
@@ -183,4 +192,13 @@ public class MainActivity extends AppCompatActivity {
         try { mSessionState.nSession.setRepeatingRequest(request, mSessionCapture, null); }
         catch (CameraAccessException e) { }
     }
+
+    public void step5() {
+        Log.e("F", "5");
+        CaptureRequest request = mCameraState.nBuilder.build();
+        Log.e("F", "5A");
+        try { mSessionState.nSession.setRepeatingRequest(request, mSessionCapture, null); }
+        catch (CameraAccessException e) { }
+    }
 }
+
